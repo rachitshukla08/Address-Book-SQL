@@ -51,3 +51,14 @@ INSERT INTO address_book VALUES  		#Adding data to insert
 	( 'Quinn', 'Smith', 'Street 5', 'City 2','California', '123459', '9876543229', 'Quinn@email.com');
 SELECT * FROM address_book WHERE city = 'City 2'
 ORDER BY first_name;
+
+#UC9
+ALTER TABLE address_book ADD name VARCHAR(20);
+ALTER TABLE address_book ADD type VARCHAR(20) DEFAULT 'Friend';
+
+#UC10
+SELECT COUNT(type) FROM address_book;
+
+#UC11
+INSERT INTO address_book VALUES   		#Adding data to insert to friend and family
+	( 'Terisa', 'Brown', 'Street 2', 'City 2','California', '123457', '9876543222', 'Terisa@email.com',NULL,'Family');
