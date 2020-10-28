@@ -62,3 +62,217 @@ SELECT COUNT(type) FROM address_book;
 #UC11
 INSERT INTO address_book VALUES   		#Adding data to insert to friend and family
 	( 'Terisa', 'Brown', 'Street 2', 'City 2','California', '123457', '9876543222', 'Terisa@email.com',NULL,'Family');
+
+#UC12
+
+CREATE TABLE user_details
+( 
+ user_id 	int PRIMARY KEY,
+ first_name 	VARCHAR(100) NOT NULL,
+ last_name 	VARCHAR(100) NOT NULL
+);
+
+describe user_details;
++------------+--------------+------+-----+---------+-------+
+| Field      | Type         | Null | Key | Default | Extra |
++------------+--------------+------+-----+---------+-------+
+| user_id    | int          | NO   | PRI | NULL    |       |
+| first_name | varchar(100) | NO   |     | NULL    |       |
+| last_name  | varchar(100) | NO   |     | NULL    |       |
++------------+--------------+------+-----+---------+-------+
+
+CREATE TABLE location 
+(
+ user_id 	int PRIMARY KEY,
+ address 	VARCHAR(100) NOT NULL,
+ city 		VARCHAR(50) NOT NULL,
+ state 		VARCHAR(50) NOT NULL,
+ zip 		VARCHAR(10) NOT NULL
+);
+
+ALTER TABLE location 
+ADD FOREIGN KEY(user_id) REFERENCES user_details(user_id);
+
+describe location;
++---------+--------------+------+-----+---------+-------+
+| Field   | Type         | Null | Key | Default | Extra |
++---------+--------------+------+-----+---------+-------+
+| user_id | int          | NO   | PRI | NULL    |       |
+| address | varchar(100) | NO   |     | NULL    |       |
+| city    | varchar(50)  | NO   |     | NULL    |       |
+| state   | varchar(50)  | NO   |     | NULL    |       |
+| zip     | varchar(10)  | NO   |     | NULL    |       |
++---------+--------------+------+-----+---------+-------+
+
+CREATE TABLE Contact
+(
+ user_id 	INT,
+ phone 		VARCHAR(15),
+ email 		VARCHAR(40),
+ FOREIGN KEY(user_id) REFERENCES user_details(user_id)
+);
+
+describe contact;
++---------+-------------+------+-----+---------+-------+
+| Field   | Type        | Null | Key | Default | Extra |
++---------+-------------+------+-----+---------+-------+
+| user_id | int         | YES  | MUL | NULL    |       |
+| phone   | varchar(15) | YES  |     | NULL    |       |
+| email   | varchar(40) | YES  |     | NULL    |       |
++---------+-------------+------+-----+---------+-------+
+
+CREATE TABLE contact_type
+(
+ type_id 		INT,
+ type_of_contact  	VARCHAR(20)
+);
+
+ALTER TABLE contact_type
+ADD PRIMARY KEY(type_id);
+describe contact_type;
++-----------------+-------------+------+-----+---------+-------+
+| Field           | Type        | Null | Key | Default | Extra |
++-----------------+-------------+------+-----+---------+-------+
+| type_id         | int         | NO   | PRI | NULL    |       |
+| type_of_contact | varchar(20) | YES  |     | NULL    |       |
++-----------------+-------------+------+-----+---------+-------+
+
+CREATE TABLE user_contact_type_link
+(
+ user_id 	INT,
+ type_id 	INT,
+ FOREIGN KEY(user_id) REFERENCES user_details(user_id),
+ FOREIGN KEY(type_id) REFERENCES contact_type(type_id)
+);
+
+describe user_contact_type_link;
++---------+------+------+-----+---------+-------+
+| Field   | Type | Null | Key | Default | Extra |
++---------+------+------+-----+---------+-------+
+| user_id | int  | YES  | MUL | NULL    |       |
+| type_id | int  | YES  | MUL | NULL    |       |
++---------+------+------+-----+---------+-------+
+
+INSERT INTO user_details VALUES  		#Data to insert
+	(1, 'Bill', 'Smith'),
+	(2, 'Terisa', 'Brown'),
+	(3, 'Charlie', 'Williams');
+
+Select * from user_details;
++---------+------------+-----------+
+| user_id | first_name | last_name |
++---------+------------+-----------+
+|       1 | Bill       | Smith     |
+|       2 | Terisa     | Brown     |
+|       3 | Charlie    | Williams  |
++---------+------------+-----------+
+
+INSERT INTO location VALUES
+ 	(1,'Street 1', 'City 1', 'California', '123456'),
+	(2,'Street 2', 'City 2','California', '123457'),
+	(3,'Street 3', 'City 3', 'Florida', '223457');
+
+select * from location;
++---------+----------+--------+------------+--------+
+| user_id | address  | city   | state      | zip    |
++---------+----------+--------+------------+--------+
+|       1 | Street 1 | City 1 | California | 123456 |
+|       2 | Street 2 | City 2 | California | 123457 |
+|       3 | Street 3 | City 3 | Florida    | 223457 |
++---------+----------+--------+------------+--------+
+
+INSERT INTO contact VALUES  		#Data to insert
+	(1,'9876543210', 'Bill@email.com'),
+	(2,'9876543222', 'Terisa@email.com'),
+	(3,'8876543210', 'Charlie@email.com');
+
+ SELECT * from contact;
++---------+------------+-------------------+
+| user_id | phone      | email             |
++---------+------------+-------------------+
+|       1 | 9876543210 | Bill@email.com    |
+|       2 | 9876543222 | Terisa@email.com  |
+|       3 | 8876543210 | Charlie@email.com |
++---------+------------+-------------------+
+
+INSERT INTO contact_type VALUES
+ 	(101,'Friend'),
+ 	(102,'Family');
+
+SELECT * FROM contact_type;
++---------+-----------------+
+| type_id | type_of_contact |
++---------+-----------------+
+|     101 | Friend          |
+|     102 | Family          |
++---------+-----------------+
+
+INSERT INTO user_contact_type_link VALUES
+ 	(1,101),
+ 	(1,102),
+ 	(2,101),
+ 	(3,102);
+
++---------+---------+
+| user_id | type_id |
++---------+---------+
+|       1 |     101 |
+|       1 |     102 |
+|       2 |     101 |
+|       3 |     102 |
++---------+---------+
+
+SELECT u.first_name,u.last_name,l.state  		#Retrieve person from a given state
+from user_details u JOIN location l
+where u.user_id = l.user_id
+AND l.state = 'California';
++------------+-----------+------------+
+| first_name | last_name | state      |
++------------+-----------+------------+
+| Bill       | Smith     | California |
+| Terisa     | Brown     | California |
++------------+-----------+------------+
+
+SELECT city,COUNT(City) FROM LOCATION;
++--------+-------------+
+| city   | COUNT(City) |
++--------+-------------+
+| City 1 |           3 |
++--------+-------------+
+
+SELECT u.first_name,u.last_name,l.city 		#Retrieve person from a given city sorted by name
+from user_details u JOIN location l
+where u.user_id = l.user_id
+AND l.city = 'City 1'
+ORDER BY u.first_name;
++------------+-----------+--------+
+| first_name | last_name | city   |
++------------+-----------+--------+
+| Bill       | Smith     | City 1 |
++------------+-----------+--------+
+
+SELECT u.first_name,u.last_name,l.state		#Retrieve person from a given state sorted by name
+from user_details u JOIN location l
+where u.user_id = l.user_id
+AND l.state = 'California'
+ORDER BY u.first_name;
+
++------------+-----------+------------+
+| first_name | last_name | state      |
++------------+-----------+------------+
+| Bill       | Smith     | California |
+| Terisa     | Brown     | California |
++------------+-----------+------------+
+
+SELECT COUNT(u.user_id) AS number_of_contacts,t.type_of_contact 
+FROM user_details u JOIN contact_type t JOIN user_contact_type_link l
+WHERE u.user_id = l.user_id
+AND t.type_id = l.type_id
+GROUP BY(t.type_of_contact);
+
++--------------------+-----------------+
+| number_of_contacts | type_of_contact |
++--------------------+-----------------+
+|                  2 | Friend          |
+|                  2 | Family          |
++--------------------+-----------------+
